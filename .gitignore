@@ -1,3 +1,4 @@
 /data
 /pics
 *.mex*
+/color/ColorMapDB
