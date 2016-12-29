@@ -136,7 +136,8 @@ for layer=1:length(LSS)
             textureMap{i,j}(~shapeMap{i,j})=1;
         end
     end
-    % 最后一层细化绘制网格
+    % 前几层在指定的网格上绘制
+    % 最后一层考察所有没有绘制的像素点
     if layer==length(LSS)
         [Y,X]=find(~canvas.isPloted);
         dis=FI(X(:),Y(:));
@@ -156,10 +157,13 @@ for layer=1:length(LSS)
         axis;
         plotAxis=get(gcf,'CurrentAxes');
     end
-    canvas.showImg(lamda,CS,textureScale,plotAxis);
+    im=canvas.showImg(lamda,CS,textureScale,plotAxis);
     title(plotAxis,sprintf('第%d层笔刷',layer));
     drawnow;
     myLog(logHandle,'时间已过 %f 秒。\n',toc);
+    if isempty(handles)
+        imwrite(im,sprintf('%d.jpg',layer));
+    end
 end
 
 % 修正图像

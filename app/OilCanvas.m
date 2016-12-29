@@ -59,8 +59,9 @@ classdef OilCanvas < handle
             im(ind)=(lamda*plotedColors+(1-lamda)*closedColors)...
                 .*repmat(showTexture(this.isPloted),[1,3]);
         end
-        function showImg(this,lamda,CS,textureScale,ax)
-            imagesc(this.getImg(lamda,CS,textureScale),'Parent',ax);
+        function im = showImg(this,lamda,CS,textureScale,ax)
+            im=this.getImg(lamda,CS,textureScale);
+            imagesc(im,'Parent',ax);
             axis(ax,'equal');
             axis(ax,'tight');
             axis(ax,'off');
