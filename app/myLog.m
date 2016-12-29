@@ -1,5 +1,8 @@
-function myLog(handles,varargin)
-hlog=getappdata(handles.figure,'hlog');
+function myLog(handle,varargin)
 str=sprintf(varargin{:});
-hlog.append(str);
+if ~isempty(handle)
+    handle.append(str);
+else
+    fprintf(str);
+end
 end

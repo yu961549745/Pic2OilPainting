@@ -22,8 +22,19 @@ function canvas = oilPaintingForUI(imgName,imScale,minLen,m,n,LSS,WSS,drawThresh
 % 输出：
 %   canvas 绘制结果
 
+if ~isempty(handles)
+    plotAxis=handles.oilAxis;
+    cla(plotAxis);
+    logHandle=getappdata(handles.figure,'hlog');
+else
+    figure;
+    axis;
+    plotAxis=get(gcf,'CurrentAxes');
+    logHandle=[];
+end
+
 [~,name,ext]=fileparts(imgName);
-myLog(handles,'%s%s\n',name,ext);
+myLog(logHandle,'%s%s\n',name,ext);
 startTime=tic();
 % 图片准备
 im=im2double(imread(imgName));
@@ -34,41 +45,39 @@ gim=rgb2gray(im);
 [M,N]=size(gim);
 
 % 获取插值基向量
-
-cla(handles.oilAxis);
-imagesc(gim,'Parent',handles.oilAxis);
-axis(handles.oilAxis,'equal');
-axis(handles.oilAxis,'tight');
-axis(handles.oilAxis,'off');
+imagesc(gim,'Parent',plotAxis);
+axis(plotAxis,'equal');
+axis(plotAxis,'tight');
+axis(plotAxis,'off');
 colormap gray;
-hold(handles.oilAxis,'on');
-title(handles.oilAxis,'');
+hold(plotAxis,'on');
+title(plotAxis,'');
 drawnow;
 
-myLog(handles,'获取基向量...\n');
-myLog(handles,'基于特征边界...\n');
+myLog(logHandle,'获取基向量...\n');
+myLog(logHandle,'基于特征边界...\n');
 tic
-[cs1,rs1,ds1]=loadFromHoughEdge(im,minLen,handles);
-title(handles.oilAxis,'基于特征边界');
+[cs1,rs1,ds1]=loadFromHoughEdge(im,minLen,plotAxis);
+title(plotAxis,'基于特征边界');
 drawnow;
-myLog(handles,'时间已过 %f 秒。\n',toc);
-myLog(handles,'基于人脸识别...\n');
+myLog(logHandle,'时间已过 %f 秒。\n',toc);
+myLog(logHandle,'基于人脸识别...\n');
 tic
 if correctCode==2
-    [cs2,rs2,ds2,edgeBW]=loadFromSTASM(scaledImgName,handles);
+    [cs2,rs2,ds2,edgeBW]=loadFromSTASM(scaledImgName,plotAxis,logHandle);
 else
-    [cs2,rs2,ds2]=loadFromSTASM(scaledImgName,handles);
+    [cs2,rs2,ds2]=loadFromSTASM(scaledImgName,plotAxis,logHandle);
 end
-title(handles.oilAxis,'基于人脸识别');
+title(plotAxis,'基于人脸识别');
 drawnow;
-myLog(handles,'时间已过 %f 秒。\n',toc);
+myLog(logHandle,'时间已过 %f 秒。\n',toc);
 cs=[cs1;cs2];
 rs=[rs1;rs2];
 ds=[ds1;ds2];
 
 % 插值计算方向
 tic
-myLog(handles,'计算方向...\n');
+myLog(logHandle,'计算方向...\n');
 R=(m+n)/4;
 indr=round(m/2):m:M;
 indc=round(n/2):n:N;
@@ -76,14 +85,14 @@ indc=round(n/2):n:N;
 FI=scatteredInterpolant(cs,rs,ds);
 dis=FI(X(:),Y(:));
 for k=1:numel(X)
-    plot(handles.oilAxis,[X(k)-R*cos(dis(k)),X(k)+R*cos(dis(k))],...
+    plot(plotAxis,[X(k)-R*cos(dis(k)),X(k)+R*cos(dis(k))],...
         [Y(k)-R*sin(dis(k)),Y(k)+R*sin(dis(k))],...
         '-g');
 end
-title(handles.oilAxis,'笔刷方向场');
-axis(handles.oilAxis,[1,N,1,M]);
+title(plotAxis,'笔刷方向场');
+axis(plotAxis,[1,N,1,M]);
 drawnow;
-myLog(handles,'时间已过 %f 秒。\n',toc);
+myLog(logHandle,'时间已过 %f 秒。\n',toc);
 
 % 加载笔刷模板
 shapes=cell(NBS,1);
@@ -93,14 +102,16 @@ for bs=1:NBS
 end
 
 % 分层绘制笔刷
-cla(handles.oilAxis);
+if ~isempty(handles)
+    cla(plotAxis);
+end
 canvas=OilCanvas(im);
 load colors CS;% 加载模板颜色
 rotateAngles=-90:90;
 NA=length(rotateAngles);
 for layer=1:length(LSS)
     tic
-    myLog(handles,'绘制第%d层笔刷...\n',layer);
+    myLog(logHandle,'绘制第%d层笔刷...\n',layer);
     lss=LSS(layer);
     wss=WSS(layer);
     drawThresh=drawThreshs(layer);
@@ -137,15 +148,20 @@ for layer=1:length(LSS)
         end
     end
     % 展示绘制结果
-    canvas.showImg(lamda,CS,textureScale,handles.oilAxis);
-    title(handles.oilAxis,sprintf('第%d层笔刷',layer));
+    if isempty(handles)
+        figure;
+        axis;
+        plotAxis=get(gcf,'CurrentAxes');
+    end
+    canvas.showImg(lamda,CS,textureScale,plotAxis);
+    title(plotAxis,sprintf('第%d层笔刷',layer));
     drawnow;
-    myLog(handles,'时间已过 %f 秒。\n',toc);
+    myLog(logHandle,'时间已过 %f 秒。\n',toc);
 end
 
 % 修正图像
 tic
-myLog(handles,'修正图像...\n');
+myLog(logHandle,'修正图像...\n');
 % 附加修正区域
 if correctCode>0
     if correctCode==1
@@ -159,12 +175,17 @@ ind=bsxfun(@plus,find(~canvas.isPloted),(0:2)*M*N);
 canvas.canvas(ind)=canvas.im(ind);
 canvas.texture(~canvas.isPloted)=1;
 canvas.isPloted=true(M,N);
-canvas.showImg(lamda,CS,textureScale,handles.oilAxis);
-title(handles.oilAxis,'最终结果');
+if isempty(handles)
+    figure;
+    axis;
+    plotAxis=get(gcf,'CurrentAxes');
+end
+canvas.showImg(lamda,CS,textureScale,plotAxis);
+title(plotAxis,'最终结果');
 drawnow;
-myLog(handles,'时间已过 %f 秒。\n',toc);
+myLog(logHandle,'时间已过 %f 秒。\n',toc);
 
 delete(scaledImgName);
-myLog(handles,'总时间：%f 秒。\n',toc(startTime));
-myLog(handles,'-------------------\n');
+myLog(logHandle,'总时间：%f 秒。\n',toc(startTime));
+myLog(logHandle,'-------------------\n');
 end

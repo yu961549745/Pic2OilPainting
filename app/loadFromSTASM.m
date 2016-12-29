@@ -1,4 +1,4 @@
-function [cs,rs,ds,bw] = loadFromSTASM(imgName,handles)
+function [cs,rs,ds,bw] = loadFromSTASM(imgName,plotAxis,logHandle)
 % 从 stasm.txt 读取预定向量组合
 % 利用 stasm.exe 获取人脸特征点
 % 返回基于特征点构造的方向向量
@@ -24,7 +24,7 @@ end
 % 读取坐标点
 P=stasm(imgName);
 if ischar(P)
-    myLog(handles,'警告：%s',P);
+    myLog(logHandle,'警告：%s',P);
     cs=[];
     rs=[];
     ds=[];
@@ -48,7 +48,7 @@ end
 for k=1:NV
     x1=P(IND(k,1),1);y1=P(IND(k,1),2);
     x2=P(IND(k,2),1);y2=P(IND(k,2),2);
-    plot(handles.oilAxis,[x1,x2],[y1,y2],'-b');
+    plot(plotAxis,[x1,x2],[y1,y2],'-b');
 end
 if nargout>3
     im=imread(imgName);

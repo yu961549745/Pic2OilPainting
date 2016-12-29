@@ -1,4 +1,4 @@
-function [cs,rs,ds] = loadFromHoughEdge(im,minLen,handles)
+function [cs,rs,ds] = loadFromHoughEdge(im,minLen,plotAxis)
 % 将边界分解成连通分量
 % 对于每个连通分量利用霍夫变换求直线
 % 返回基于边界信息的方向向量
@@ -52,7 +52,7 @@ for i=1:list.size()
     xy=list.get(i-1);
     x1=xy(1,1);y1=xy(1,2);
     x2=xy(2,1);y2=xy(2,2);
-    plot(handles.oilAxis,[x1,x2],[y1,y2],'-r');
+    plot(plotAxis,[x1,x2],[y1,y2],'-r');
 end
 % 增加边界参考
 [M,N]=size(gim);
