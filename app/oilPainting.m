@@ -1,4 +1,4 @@
-function canvas = oilPaintingForUI(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
+function canvas = oilPainting(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
     textureScale,lamda,correctCode,correctR,NBS,handles)
 % 油画风格化绘制
 % 输入：
@@ -53,14 +53,17 @@ colormap gray;
 hold(plotAxis,'on');
 title(plotAxis,'');
 drawnow;
-
 myLog(logHandle,'获取基向量...\n');
+
+% 基于特征边界
 myLog(logHandle,'基于特征边界...\n');
 tic
 [cs1,rs1,ds1]=loadFromHoughEdge(im,minLen,plotAxis);
 title(plotAxis,'基于特征边界');
 drawnow;
 myLog(logHandle,'时间已过 %f 秒。\n',toc);
+
+% 基于人脸识别
 myLog(logHandle,'基于人脸识别...\n');
 tic
 if correctCode==2

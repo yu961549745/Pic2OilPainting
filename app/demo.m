@@ -12,5 +12,5 @@ lamda=0.2;
 correctCode=2;
 correctR=3;
 NBS=2;
-canvas = oilPaintingForUI(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
+canvas = oilPainting(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
     textureScale,lamda,correctCode,correctR,NBS,[]);

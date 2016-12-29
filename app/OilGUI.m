@@ -73,7 +73,7 @@ imgName=getappdata(handles.figure,'imgName');
 if isempty(imgName)
     return;
 end
-canvas = oilPaintingForUI(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
+canvas = oilPainting(imgName,imScale,minLen,m,n,LSS,WSS,drawThreshs,...
     textureScale,lamda,correctCode,correctR,NBS,handles);
 setappdata(handles.figure,'canvas',canvas);
 
